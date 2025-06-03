@@ -20,7 +20,7 @@ const LoginModal: React.FC<Props> = ({ open, onClose, onLogin }) => {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:3000/auth/request-otp', {
+      const res = await fetch('https://matchkin-tbqg.onrender.com/auth/request-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, role: 'client' }),
@@ -38,7 +38,7 @@ const LoginModal: React.FC<Props> = ({ open, onClose, onLogin }) => {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:3000/auth/verify-otp', {
+      const res = await fetch('https://matchkin-tbqg.onrender.com/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp }),

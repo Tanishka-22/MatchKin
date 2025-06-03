@@ -11,7 +11,6 @@ function App() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [token, setToken] = useState<string | null>(null);
 
-  // Optionally, persist token in localStorage
   React.useEffect(() => {
     const t = localStorage.getItem('token');
     if (t) setToken(t);
