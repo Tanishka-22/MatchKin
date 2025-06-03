@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MatchKin - Test UI</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: 20px auto; padding: 10px; }
+    input, button, textarea { margin: 5px 0; width: 100%; padding: 8px; }
+    #results { margin-top: 20px; }
+    .match { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h2>📨 Step 1: Request OTP</h2>
+  <input id="email" placeholder="Email (e.g., client@example.com)" />
+  <button onclick="requestOTP()">Request OTP</button>
+
+  <h2>🔐 Step 2: Verify OTP</h2>
+  <input id="otp" placeholder="OTP (try 123456 if simulating)" />
+  <button onclick="verifyOTP()">Verify OTP & Login</button>
+  <p id="tokenDisplay"></p>
+
+  <h2>💡 Step 3: Match Consultants</h2>
+  <textarea id="project" rows="5">
+{
+  "skills": ["React", "MongoDB"],
+  "domain": "Web Development",
+  "timeline": "1 month"
+}
+  </textarea>
+  <button onclick="matchConsultants()">Find Matches</button>
+
+  <div id="results"></div>
+
+  <script>
+    let token = "";
+
+    function requestOTP() {
+      const email = document.getElementById("email").value;
+      fetch("http://localhost:3000/auth/request-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, role: "client" }),
+      })
+      .then(res => res.json())
+      .then(data => alert("OTP sent (or simulated). Now enter it below."));
+    }
+
+    function verifyOTP() {
+      const email = document.getElementById("email").value;
+      const otp = document.getElementById("otp").value;
+      fetch("http://localhost:3000/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        token = data.token;
+        document.getElementById("tokenDisplay").textContent = "✅ Logged in. Token stored.";
+      });
+    }
+
+    function matchConsultants() {
+      const project = document.getElementById("project").value;
+      fetch("http://localhost:3000/match", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: project,
+      })
+      .then(res => res.json())
+      .then(data => {
+        const results = document.getElementById("results");
+        results.innerHTML = "<h3>🔍 Match Results</h3>";
+        data.matches.forEach(match => {
+          results.innerHTML += `
+            <div class="match">
+              <strong>Email:</strong> ${match.email}<br/>
+              <strong>Score:</strong> ${match.score}<br/>
+              <strong>Reason:</strong> ${match.reason}
+            </div>
+          `;
+        });
+      });
+    }
+  </script>
+</body>
+</html>
